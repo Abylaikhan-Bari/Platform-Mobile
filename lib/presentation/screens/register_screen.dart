@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart'; // Import added
 import '../../data/repositories/auth_repository.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -70,10 +70,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               onPressed: _handleRegistration,
               child: const Text('Register'),
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Already have an account? Login'),
-            ),
           ],
         ),
       ),
@@ -90,7 +86,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _passwordController.text.trim(),
         );
 
-        // Optional: Assign default role after successful registration
         await context.read<AuthRepository>().assignRole('user');
 
         if (mounted) {

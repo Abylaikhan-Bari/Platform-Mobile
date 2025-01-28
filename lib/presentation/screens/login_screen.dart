@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart'; // Import added
 import 'package:platform/data/repositories/auth_repository.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -38,10 +38,8 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
                   try {
-                    await context.read<AuthRepository>().login(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
+                    final authRepo = Provider.of<AuthRepository>(context, listen: false);
+                    await authRepo.login(_emailController.text, _passwordController.text);
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(e.toString())),

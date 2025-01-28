@@ -3,14 +3,30 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:platform/bloc/book_bloc.dart';
+import 'package:platform/data/repositories/auth_repository.dart';
 import 'package:platform/data/repositories/book_repository.dart';
 import 'package:platform/presentation/screens/auth_screen.dart';
 import 'package:platform/presentation/screens/home_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AuthRepository>(create: (_) => AuthRepository()),
+        Provider<BookRepository>(create: (_) => BookRepository()),
+        BlocProvider(
+          create: (context) => BookBloc(
+            bookUseCases: context.read<BookRepository>(),
+          ),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,12 +40,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: BlocProvider(
-        create: (context) => BookBloc(
-          bookUseCases: BookRepository(),
-        ),
-        child: const AuthWrapper(),
-      ),
+      home: const AuthWrapper(),
     );
   }
 }
@@ -43,7 +54,7 @@ class AuthWrapper extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         }
         return snapshot.hasData ? const HomeScreen() : const AuthScreen();
       },
