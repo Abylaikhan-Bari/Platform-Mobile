@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "270806113383",
+    "project_id": "platform-780bc",
+    "storage_bucket": "platform-780bc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270806113383:android:6bd035fa2a42251e1748c2",
+        "android_client_info": {
+          "package_name": "com.aikei.platform"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3rfH2pUjcuQmce4yh4sSlbGVNzjPQxQE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
