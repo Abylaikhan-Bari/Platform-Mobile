@@ -33,7 +33,7 @@ extension BookEntityExtension on Book {
     id: id,
     title: title,
     author: author,
-    description: description,
+    content: content,
   );
 }
 
@@ -41,6 +41,6 @@ extension BookJsonExtension on BookEntity {
   Map<String, dynamic> toJson() => {
     'title': title,
     'author': author,
-    'description': description,
+    'content': content,
   };
 }

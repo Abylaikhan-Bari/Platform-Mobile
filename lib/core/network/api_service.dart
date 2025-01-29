@@ -11,12 +11,16 @@ class ApiService {
       String endpoint, {
         Map<String, dynamic>? body,
       }) async {
-    final token = await _firebaseService.getUserIdToken();
+    final token = await _firebaseService.getUserIdToken(); // Get Firebase token
+    if (token == null) {
+      throw Exception("User is not authenticated.");
+    }
+
     final url = Uri.parse('${AppConstants.baseUrl}$endpoint');
 
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $token', // Send Firebase token
     };
 
     switch (method.toUpperCase()) {

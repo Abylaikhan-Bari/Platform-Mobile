@@ -16,7 +16,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
   final _formKey = GlobalKey<FormState>();
   late final _titleController = TextEditingController(text: widget.book.title);
   late final _authorController = TextEditingController(text: widget.book.author);
-  late final _descriptionController = TextEditingController(text: widget.book.description);
+  late final _contentController = TextEditingController(text: widget.book.content);
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +39,9 @@ class _EditBookScreenState extends State<EditBookScreen> {
                 validator: (value) => value!.isEmpty ? 'Enter author' : null,
               ),
               TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                validator: (value) => value!.isEmpty ? 'Enter description' : null,
+                controller: _contentController,
+                decoration: const InputDecoration(labelText: 'Content'),
+                validator: (value) => value!.isEmpty ? 'Enter content' : null,
                 maxLines: 3,
               ),
               const SizedBox(height: 20),
@@ -52,7 +52,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                       id: widget.book.id,
                       title: _titleController.text,
                       author: _authorController.text,
-                      description: _descriptionController.text,
+                      content: _contentController.text,
                     );
                     context.read<BookBloc>().add(UpdateBookEvent(book: updatedBook));
                     Navigator.pop(context);

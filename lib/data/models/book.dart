@@ -2,13 +2,13 @@ class Book {
   final String id;
   final String title;
   final String author;
-  final String description;
+  final String content; // Changed from 'description' to 'content'
 
   Book({
     required this.id,
     required this.title,
     required this.author,
-    required this.description,
+    required this.content,
   });
 
   factory Book.fromJson(Map<String, dynamic> json) {
@@ -16,13 +16,13 @@ class Book {
       id: json['_id'],
       title: json['title'],
       author: json['author'],
-      description: json['description'],
+      content: json['content'], // Changed from 'description' to 'content'
     );
   }
 
   Map<String, dynamic> toJson() => {
     'title': title,
     'author': author,
-    'description': description,
+    'content': content, // Changed from 'description' to 'content'
   };
 }

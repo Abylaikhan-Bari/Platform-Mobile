@@ -14,7 +14,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _authorController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  final _contentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +37,9 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
                 validator: (value) => value!.isEmpty ? 'Enter author' : null,
               ),
               TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Description'),
-                validator: (value) => value!.isEmpty ? 'Enter description' : null,
+                controller: _contentController,
+                decoration: const InputDecoration(labelText: 'Content'),
+                validator: (value) => value!.isEmpty ? 'Enter content' : null,
                 maxLines: 3,
               ),
               const SizedBox(height: 20),
@@ -50,7 +50,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
                       id: '',
                       title: _titleController.text,
                       author: _authorController.text,
-                      description: _descriptionController.text,
+                      content: _contentController.text,
                     );
                     context.read<BookBloc>().add(CreateBookEvent(book: newBook));
                     Navigator.pop(context);
