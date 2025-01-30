@@ -4,8 +4,19 @@ import 'package:platform/bloc/book_bloc.dart';
 import 'create_book_screen.dart';
 import 'edit_book_screen.dart';
 
-class BooksScreen extends StatelessWidget {
+class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
+
+  @override
+  _BooksScreenState createState() => _BooksScreenState();
+}
+
+class _BooksScreenState extends State<BooksScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<BookBloc>().add(FetchBooksEvent()); // 🔥 Trigger fetch books
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +35,12 @@ class BooksScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is BookError) {
-            return Center(child: Text(state.message));
+            return Center(child: Text("Error: ${state.message}"));
           }
           if (state is BookLoaded) {
-            return ListView.builder(
+            return state.books.isEmpty
+                ? const Center(child: Text('No books available'))
+                : ListView.builder(
               itemCount: state.books.length,
               itemBuilder: (context, index) {
                 final book = state.books[index];

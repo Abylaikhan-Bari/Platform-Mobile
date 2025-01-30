@@ -11,7 +11,7 @@ class ApiService {
       String endpoint, {
         Map<String, dynamic>? body,
       }) async {
-    final token = await _firebaseService.getUserIdToken(); // Get Firebase token
+    final token = await _firebaseService.getUserIdToken();
     if (token == null) {
       throw Exception("User is not authenticated.");
     }
@@ -20,7 +20,7 @@ class ApiService {
 
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token', // Send Firebase token
+      'Authorization': 'Bearer $token', // ✅ Correct token usage
     };
 
     switch (method.toUpperCase()) {
@@ -57,7 +57,11 @@ class ApiService {
 
   Future<List<dynamic>> getBooks() async {
     final response = await _authenticatedRequest('GET', AppConstants.booksEndpoint);
-    return jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to fetch books: ${response.body}");
+    }
   }
 
   Future<dynamic> createBook(Map<String, dynamic> bookData) async {

@@ -30,7 +30,7 @@ class FirebaseService {
   Future<String?> getUserIdToken() async {
     final user = _auth.currentUser;
     if (user != null) {
-      return await user.getIdToken();
+      return await user.getIdToken(true); // 🔥 Force token refresh
     }
     return null;
   }
