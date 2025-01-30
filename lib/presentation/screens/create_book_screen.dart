@@ -29,17 +29,17 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: 'Title'),
-                validator: (value) => value!.isEmpty ? 'Enter title' : null,
+                validator: (value) => value!.trim().isEmpty ? 'Enter title' : null,
               ),
               TextFormField(
                 controller: _authorController,
                 decoration: const InputDecoration(labelText: 'Author'),
-                validator: (value) => value!.isEmpty ? 'Enter author' : null,
+                validator: (value) => value!.trim().isEmpty ? 'Enter author' : null,
               ),
               TextFormField(
                 controller: _contentController,
                 decoration: const InputDecoration(labelText: 'Content'),
-                validator: (value) => value!.isEmpty ? 'Enter content' : null,
+                validator: (value) => value!.trim().isEmpty ? 'Enter content' : null,
                 maxLines: 3,
               ),
               const SizedBox(height: 20),
@@ -47,10 +47,12 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     final newBook = BookEntity(
-                      id: '',
-                      title: _titleController.text,
-                      author: _authorController.text,
-                      content: _contentController.text,
+                      id: "", // Provide default empty ID, backend will generate it
+                      title: _titleController.text.trim(),
+                      author: _authorController.text.trim(),
+                      content: _contentController.text.trim().isNotEmpty
+                          ? _contentController.text
+                          : "", // Ensure content is not null
                     );
                     context.read<BookBloc>().add(CreateBookEvent(book: newBook));
                     Navigator.pop(context);

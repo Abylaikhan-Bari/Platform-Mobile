@@ -37,9 +37,10 @@ class BookBloc extends Bloc<BookEvent, BookState> {
       ) async {
     try {
       await bookUseCases.createBook(event.book);
-      add(FetchBooksEvent());
+      final books = await bookUseCases.getBooks();
+      emit(BookLoaded(books: books));
     } catch (e) {
-      emit(BookError(message: e.toString()));
+      emit(BookError(message: "Failed to create book: ${e.toString()}"));
     }
   }
 
@@ -49,9 +50,10 @@ class BookBloc extends Bloc<BookEvent, BookState> {
       ) async {
     try {
       await bookUseCases.updateBook(event.book);
-      add(FetchBooksEvent());
+      final books = await bookUseCases.getBooks();
+      emit(BookLoaded(books: books));
     } catch (e) {
-      emit(BookError(message: e.toString()));
+      emit(BookError(message: "Failed to update book: ${e.toString()}"));
     }
   }
 
@@ -61,9 +63,11 @@ class BookBloc extends Bloc<BookEvent, BookState> {
       ) async {
     try {
       await bookUseCases.deleteBook(event.bookId);
-      add(FetchBooksEvent());
+      final books = await bookUseCases.getBooks();
+      emit(BookLoaded(books: books));
     } catch (e) {
-      emit(BookError(message: e.toString()));
+      emit(BookError(message: "Failed to delete book: ${e.toString()}"));
     }
   }
+
 }

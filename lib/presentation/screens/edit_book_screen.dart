@@ -16,7 +16,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
   final _formKey = GlobalKey<FormState>();
   late final _titleController = TextEditingController(text: widget.book.title);
   late final _authorController = TextEditingController(text: widget.book.author);
-  late final _contentController = TextEditingController(text: widget.book.content);
+  late final _contentController = TextEditingController(text: widget.book.content ?? "");
 
   @override
   Widget build(BuildContext context) {

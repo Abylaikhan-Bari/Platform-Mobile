@@ -20,7 +20,10 @@ class BookRepository implements BookUseCases {
 
   @override
   Future<BookEntity> updateBook(BookEntity book) async {
-    final updatedBook = await _apiService.updateBook(book.id, book.toJson());
+    final updatedBook = await _apiService.updateBook(
+      book.id ?? "", // Ensure non-null id
+      book.toJson(),
+    );
     return Book.fromJson(updatedBook).toEntity();
   }
 
@@ -30,10 +33,10 @@ class BookRepository implements BookUseCases {
 
 extension BookEntityExtension on Book {
   BookEntity toEntity() => BookEntity(
-    id: id,
+    id: id ?? "", // Ensure id is not null
     title: title,
     author: author,
-    content: content,
+    content: content ?? "", // Ensure content is not null
   );
 }
 
@@ -41,6 +44,6 @@ extension BookJsonExtension on BookEntity {
   Map<String, dynamic> toJson() => {
     'title': title,
     'author': author,
-    'content': content,
+    if (content != null) 'content': content, // Only include content if it's non-null
   };
 }
