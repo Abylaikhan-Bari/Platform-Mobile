@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Import added
+import 'package:provider/provider.dart';
 import '../../../data/repositories/auth_repository.dart';
 
 class RegisterComponent extends StatefulWidget {
@@ -19,54 +19,41 @@ class _RegisterComponentState extends State<RegisterComponent> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
       child: Form(
         key: _formKey,
         child: Column(
           children: [
+            Text(
+              "Create an Account",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            const SizedBox(height: 20),
             TextFormField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: _inputDecoration("Email"),
               keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
+              validator: _validateEmail,
             ),
+            const SizedBox(height: 12),
             TextFormField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
+              decoration: _inputDecoration("Password"),
               obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a password';
-                }
-                if (value.length < 6) {
-                  return 'Password must be at least 6 characters';
-                }
-                return null;
-              },
+              validator: _validatePassword,
             ),
+            const SizedBox(height: 12),
             TextFormField(
               controller: _confirmPasswordController,
-              decoration: const InputDecoration(labelText: 'Confirm Password'),
+              decoration: _inputDecoration("Confirm Password"),
               obscureText: true,
-              validator: (value) {
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
+              validator: _validateConfirmPassword,
             ),
             const SizedBox(height: 20),
             _isLoading
-                ? const CircularProgressIndicator()
+                ? const CircularProgressIndicator(color: Colors.green)
                 : ElevatedButton(
+              style: _buttonStyle(),
               onPressed: _handleRegistration,
               child: const Text('Register'),
             ),
@@ -92,7 +79,7 @@ class _RegisterComponentState extends State<RegisterComponent> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registration successful!')),
           );
-          Navigator.pop(context); // Return to auth screen
+          Navigator.pop(context);
         }
       } catch (e) {
         if (mounted) {
@@ -106,6 +93,26 @@ class _RegisterComponentState extends State<RegisterComponent> {
         }
       }
     }
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
+  String? _validateEmail(String? value) => value == null || value.isEmpty ? 'Please enter your email' : null;
+  String? _validatePassword(String? value) => value == null || value.isEmpty ? 'Please enter your password' : null;
+  String? _validateConfirmPassword(String? value) => value != _passwordController.text ? 'Passwords do not match' : null;
+
+  ButtonStyle _buttonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: Colors.green,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
   }
 
   @override
