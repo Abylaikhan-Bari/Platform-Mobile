@@ -11,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final User? _user = FirebaseAuth.instance.currentUser;
+  bool isLoggingOut = false;
 
   void _confirmLogout() {
     showDialog(
@@ -46,13 +46,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     TextButton(
                       onPressed: () async {
+                        setState(() {
+                          isLoggingOut = true;
+                        });
+
                         await FirebaseAuth.instance.signOut();
                         if (mounted) {
-                          Navigator.of(context).pop(); // Close dialog
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const AuthScreen()),
-                          );
+                          Navigator.of(context).pop(); // ✅ Close dialog
+                          Future.delayed(const Duration(milliseconds: 500), () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const AuthScreen()),
+                            );
+                          });
                         }
                       },
                       child: const Text("Sign Out", style: TextStyle(color: Colors.red)),
@@ -81,13 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text(
                 "Welcome to Platform",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Center(
-              child: Text(
-                _user?.email ?? "Guest User",
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               ),
             ),
             const SizedBox(height: 30),

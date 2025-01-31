@@ -38,24 +38,52 @@ class MyApp extends StatelessWidget {
       title: 'Platform',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green, // ✅ Ensures theme consistency
+        scaffoldBackgroundColor: Colors.white, // ✅ Matches UI design
+        progressIndicatorTheme: const ProgressIndicatorThemeData(
+          color: Colors.green, // ✅ Ensure green loading indicator
+        ),
       ),
       home: const AuthWrapper(),
     );
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
+
+  @override
+  _AuthWrapperState createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  bool isProcessingSignOut = false;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        debugPrint("🔥 AuthState Change Triggered: ${snapshot.data?.email}");
+
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: CircularProgressIndicator(), // ✅ Green loading indicator
+            ),
+          );
         }
+
+        if (isProcessingSignOut) {
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: CircularProgressIndicator(), // ✅ Show loading while signing out
+            ),
+          );
+        }
+
         return snapshot.hasData ? const HomeScreen() : const AuthScreen();
       },
     );
