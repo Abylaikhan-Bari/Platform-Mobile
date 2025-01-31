@@ -94,68 +94,78 @@ class _BooksScreenState extends State<BooksScreen> {
           if (state is BookLoaded) {
             return Padding(
               padding: const EdgeInsets.all(12.0),
-              child: GridView.builder(
-                itemCount: state.books.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Two books per row
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.85, // Adjust height
-                ),
-                itemBuilder: (context, index) {
-                  final book = state.books[index];
-                  return GestureDetector(
-                    onTap: () {
-                      _showBookDetailsDialog(context, book);
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              book.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+              child: SingleChildScrollView(
+                child: GridView.builder(
+                  shrinkWrap: true, // Ensures proper layout inside SingleChildScrollView
+                  physics: const NeverScrollableScrollPhysics(), // Prevents nested scrolling issues
+                  itemCount: state.books.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // Two books per row
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85, // Adjust height
+                  ),
+                  itemBuilder: (context, index) {
+                    final book = state.books[index];
+                    return GestureDetector(
+                      onTap: () {
+                        _showBookDetailsDialog(context, book);
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min, // Prevents overflow
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                book.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "Author: ${book.author}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
-                            if (isAdmin == true)
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit, color: Colors.blue),
-                                    onPressed: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => EditBookScreen(book: book),
+                              const SizedBox(height: 6),
+                              Text(
+                                "Author: ${book.author}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              const Spacer(), // Pushes icons to bottom
+                              if (isAdmin == true)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min, // Prevents expansion
+                                  children: [
+                                    Flexible(
+                                      child: IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.blue),
+                                        onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => EditBookScreen(book: book),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _confirmDelete(context, book.id),
-                                  ),
-                                ],
-                              ),
-                          ],
+                                    Flexible(
+                                      child: IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () => _confirmDelete(context, book.id),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             );
           }
