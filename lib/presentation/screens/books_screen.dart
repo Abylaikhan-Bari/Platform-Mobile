@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:platform/domain/entities/book_entity.dart';
 import 'package:platform/bloc/book_bloc.dart';
 import '../../core/network/firebase_service.dart';
-import 'create_book_screen.dart';
-import 'edit_book_screen.dart';
+import 'components/create_book_component.dart';
+import 'components/edit_book_component.dart';
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -42,6 +42,20 @@ class _BooksScreenState extends State<BooksScreen> {
     }
   }
 
+  void _showCreateBookPopup() {
+    showDialog(
+      context: context,
+      builder: (context) => const CreateBookScreen(),
+    );
+  }
+
+  void _showEditBookPopup(BookEntity book) {
+    showDialog(
+      context: context,
+      builder: (context) => EditBookScreen(book: book),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint("🔥 isAdmin: $isAdmin");
@@ -59,15 +73,9 @@ class _BooksScreenState extends State<BooksScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Row(
-          children: [
-            Icon(Icons.menu_book, color: Colors.white),
-            SizedBox(width: 10),
-            Text(
-              'Books',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-          ],
+        title: const Text(
+          'Books',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
       floatingActionButton: isAdmin == true
@@ -75,10 +83,7 @@ class _BooksScreenState extends State<BooksScreen> {
         padding: const EdgeInsets.only(bottom: 20.0, right: 10.0),
         child: FloatingActionButton(
           backgroundColor: Colors.green,
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CreateBookScreen()),
-          ),
+          onPressed: _showCreateBookPopup,
           child: const Icon(Icons.add, color: Colors.white),
         ),
       )
@@ -97,17 +102,15 @@ class _BooksScreenState extends State<BooksScreen> {
               child: GridView.builder(
                 itemCount: state.books.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Two books per row
+                  crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 0.80, // Adjusted for better text layout
+                  childAspectRatio: 0.80,
                 ),
                 itemBuilder: (context, index) {
                   final book = state.books[index];
                   return GestureDetector(
-                    onTap: () {
-                      _showBookDetailsDialog(context, book);
-                    },
+                    onTap: () => _showBookDetailsPopup(context, book),
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -147,12 +150,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                   children: [
                                     IconButton(
                                       icon: const Icon(Icons.edit, color: Colors.blue),
-                                      onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => EditBookScreen(book: book),
-                                        ),
-                                      ),
+                                      onPressed: () => _showEditBookPopup(book),
                                     ),
                                     IconButton(
                                       icon: const Icon(Icons.delete, color: Colors.red),
@@ -176,7 +174,7 @@ class _BooksScreenState extends State<BooksScreen> {
     );
   }
 
-  void _showBookDetailsDialog(BuildContext context, BookEntity book) {
+  void _showBookDetailsPopup(BuildContext context, BookEntity book) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
