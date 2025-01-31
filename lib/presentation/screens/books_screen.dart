@@ -100,7 +100,7 @@ class _BooksScreenState extends State<BooksScreen> {
                   crossAxisCount: 2, // Two books per row
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 0.92, // Adjusted to fit content properly
+                  childAspectRatio: 0.80, // Adjusted for better text layout
                 ),
                 itemBuilder: (context, index) {
                   final book = state.books[index];
@@ -118,33 +118,32 @@ class _BooksScreenState extends State<BooksScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Flexible(
+                            Expanded(
                               child: Text(
                                 book.title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(height: 6),
-                            Flexible(
+                            Expanded(
                               child: Text(
                                 "Author: ${book.author}",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 14),
-                                overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            const Spacer(), // Pushes buttons to the bottom
                             if (isAdmin == true)
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: Wrap(
-                                  spacing: 5, // Prevents overflow issues
+                                  spacing: 5,
                                   children: [
                                     IconButton(
                                       icon: const Icon(Icons.edit, color: Colors.blue),
