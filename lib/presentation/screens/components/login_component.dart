@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Import added
 import 'package:platform/data/repositories/auth_repository.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginComponent extends StatefulWidget {
+  const LoginComponent({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginComponentState createState() => _LoginComponentState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginComponentState extends State<LoginComponent> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();

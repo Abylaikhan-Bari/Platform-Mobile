@@ -20,7 +20,7 @@ class _BooksScreenState extends State<BooksScreen> {
   void initState() {
     super.initState();
     _fetchUserRole();
-    context.read<BookBloc>().add(FetchBooksEvent()); // Fetch books
+    _refreshBooks(); // Fetch initial data
   }
 
   Future<void> _fetchUserRole() async {
@@ -42,18 +42,22 @@ class _BooksScreenState extends State<BooksScreen> {
     }
   }
 
+  Future<void> _refreshBooks() async {
+    context.read<BookBloc>().add(FetchBooksEvent()); // Fetch latest books
+  }
+
   void _showCreateBookPopup() {
     showDialog(
       context: context,
       builder: (context) => const CreateBookScreen(),
-    );
+    ).then((_) => _refreshBooks()); // Refresh after closing
   }
 
   void _showEditBookPopup(BookEntity book) {
     showDialog(
       context: context,
       builder: (context) => EditBookScreen(book: book),
-    );
+    ).then((_) => _refreshBooks()); // Refresh after closing
   }
 
   @override
@@ -62,7 +66,11 @@ class _BooksScreenState extends State<BooksScreen> {
 
     if (isAdmin == null) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Colors.green, // ✅ Custom loading indicator color
+          ),
+        ),
       );
     }
 
@@ -79,97 +87,104 @@ class _BooksScreenState extends State<BooksScreen> {
         ),
       ),
       floatingActionButton: isAdmin == true
-          ? Padding(
-        padding: const EdgeInsets.only(bottom: 20.0, right: 10.0),
-        child: FloatingActionButton(
-          backgroundColor: Colors.green,
-          onPressed: _showCreateBookPopup,
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
+          ? FloatingActionButton(
+        backgroundColor: Colors.green,
+        onPressed: _showCreateBookPopup,
+        child: const Icon(Icons.add, color: Colors.white),
       )
           : null,
-      body: BlocBuilder<BookBloc, BookState>(
-        builder: (context, state) {
-          if (state is BookLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is BookError) {
-            return Center(child: Text("Failed to fetch books: ${state.message}"));
-          }
-          if (state is BookLoaded) {
-            return Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: GridView.builder(
-                itemCount: state.books.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.80,
+      body: RefreshIndicator(
+        onRefresh: _refreshBooks, // ✅ Refresh on pull-down
+        color: Colors.green, // ✅ Custom refresh indicator color
+        child: BlocBuilder<BookBloc, BookState>(
+          builder: (context, state) {
+            if (state is BookLoading) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.green, // ✅ Matches design
                 ),
-                itemBuilder: (context, index) {
-                  final book = state.books[index];
-                  return GestureDetector(
-                    onTap: () => _showBookDetailsPopup(context, book),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 5,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                book.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Expanded(
-                              child: Text(
-                                "Author: ${book.author}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (isAdmin == true)
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Wrap(
-                                  spacing: 5,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit, color: Colors.blue),
-                                      onPressed: () => _showEditBookPopup(book),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _confirmDelete(context, book.id),
-                                    ),
-                                  ],
+              );
+            }
+            if (state is BookError) {
+              return Center(child: Text("Failed to fetch books: ${state.message}"));
+            }
+            if (state is BookLoaded) {
+              return Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: GridView.builder(
+                  itemCount: state.books.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.85, // ✅ Adjusted for better layout
+                  ),
+                  itemBuilder: (context, index) {
+                    final book = state.books[index];
+                    return GestureDetector(
+                      onTap: () => _showBookDetailsPopup(context, book),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  book.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                          ],
+                              const SizedBox(height: 6),
+                              Expanded(
+                                child: Text(
+                                  "Author: ${book.author}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (isAdmin == true)
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Wrap(
+                                    spacing: 5,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.blue),
+                                        onPressed: () => _showEditBookPopup(book),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () => _confirmDelete(context, book.id),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-          return const Center(child: Text('No books available'));
-        },
+                    );
+                  },
+                ),
+              );
+            }
+            return const Center(child: Text('No books available'));
+          },
+        ),
       ),
     );
   }

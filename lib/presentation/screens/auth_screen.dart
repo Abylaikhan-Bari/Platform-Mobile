@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'register_screen.dart';
-
+import 'components/login_component.dart';
+import 'components/register_component.dart';
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
 
@@ -21,8 +20,8 @@ class AuthScreen extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            LoginScreen(),
-            RegisterScreen(),
+            LoginComponent(),
+            RegisterComponent(),
           ],
         ),
       ),
