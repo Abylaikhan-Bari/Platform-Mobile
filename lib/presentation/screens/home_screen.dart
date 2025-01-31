@@ -12,6 +12,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoggingOut = false;
+  String? userEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserEmail();
+  }
+
+  void _fetchUserEmail() {
+    final user = FirebaseAuth.instance.currentUser;
+    setState(() {
+      userEmail = user?.email ?? "Unknown User"; // ✅ Handles null email properly
+    });
+  }
 
   void _confirmLogout() {
     showDialog(
@@ -83,13 +97,26 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
-            const Center(
-              child: Text(
-                "Welcome to Platform",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+
+            // ✅ Displays current user's email
+            Center(
+              child: Column(
+                children: [
+                  const Text(
+                    "Welcome to Platform",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    userEmail ?? "Loading...", // ✅ Displays user email
+                    style: const TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                ],
               ),
             ),
+
             const SizedBox(height: 30),
+
             _buildMenuButton(Icons.book, "Books", () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const BooksScreen()));
             }),
