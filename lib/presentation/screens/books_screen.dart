@@ -94,78 +94,80 @@ class _BooksScreenState extends State<BooksScreen> {
           if (state is BookLoaded) {
             return Padding(
               padding: const EdgeInsets.all(12.0),
-              child: SingleChildScrollView(
-                child: GridView.builder(
-                  shrinkWrap: true, // Ensures proper layout inside SingleChildScrollView
-                  physics: const NeverScrollableScrollPhysics(), // Prevents nested scrolling issues
-                  itemCount: state.books.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Two books per row
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.85, // Adjust height
-                  ),
-                  itemBuilder: (context, index) {
-                    final book = state.books[index];
-                    return GestureDetector(
-                      onTap: () {
-                        _showBookDetailsDialog(context, book);
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min, // Prevents overflow
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
+              child: GridView.builder(
+                itemCount: state.books.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Two books per row
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.92, // Adjusted to fit content properly
+                ),
+                itemBuilder: (context, index) {
+                  final book = state.books[index];
+                  return GestureDetector(
+                    onTap: () {
+                      _showBookDetailsDialog(context, book);
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Flexible(
+                              child: Text(
                                 book.title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
                               ),
-                              const SizedBox(height: 6),
-                              Text(
+                            ),
+                            const SizedBox(height: 6),
+                            Flexible(
+                              child: Text(
                                 "Author: ${book.author}",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 14),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
                               ),
-                              const Spacer(), // Pushes icons to bottom
-                              if (isAdmin == true)
-                                Row(
-                                  mainAxisSize: MainAxisSize.min, // Prevents expansion
+                            ),
+                            const Spacer(), // Pushes buttons to the bottom
+                            if (isAdmin == true)
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Wrap(
+                                  spacing: 5, // Prevents overflow issues
                                   children: [
-                                    Flexible(
-                                      child: IconButton(
-                                        icon: const Icon(Icons.edit, color: Colors.blue),
-                                        onPressed: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => EditBookScreen(book: book),
-                                          ),
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Colors.blue),
+                                      onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => EditBookScreen(book: book),
                                         ),
                                       ),
                                     ),
-                                    Flexible(
-                                      child: IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.red),
-                                        onPressed: () => _confirmDelete(context, book.id),
-                                      ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: () => _confirmDelete(context, book.id),
                                     ),
                                   ],
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             );
           }
@@ -223,22 +225,45 @@ class _BooksScreenState extends State<BooksScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Confirm Delete"),
-          content: const Text("Are you sure you want to delete this book?"),
-          actions: [
-            TextButton(
-              child: const Text("Cancel"),
-              onPressed: () => Navigator.of(context).pop(),
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 6,
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Confirm Delete",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Are you sure you want to delete this book?",
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("Cancel", style: TextStyle(color: Colors.blue)),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        context.read<BookBloc>().add(DeleteBookEvent(bookId: bookId));
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Delete", style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            TextButton(
-              child: const Text("Delete"),
-              onPressed: () {
-                context.read<BookBloc>().add(DeleteBookEvent(bookId: bookId));
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+          ),
         );
       },
     );
