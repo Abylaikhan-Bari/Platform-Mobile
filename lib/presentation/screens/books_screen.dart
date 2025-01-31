@@ -53,14 +53,34 @@ class _BooksScreenState extends State<BooksScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage Books')),
-      floatingActionButton: isAdmin == true
-          ? FloatingActionButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const CreateBookScreen()),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        child: const Icon(Icons.add),
+        title: const Row(
+          children: [
+            Icon(Icons.menu_book, color: Colors.white),
+            SizedBox(width: 10),
+            Text(
+              'Books',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: isAdmin == true
+          ? Padding(
+        padding: const EdgeInsets.only(bottom: 20.0, right: 10.0),
+        child: FloatingActionButton(
+          backgroundColor: Colors.green,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CreateBookScreen()),
+          ),
+          child: const Icon(Icons.add, color: Colors.white),
+        ),
       )
           : null,
       body: BlocBuilder<BookBloc, BookState>(
@@ -69,43 +89,123 @@ class _BooksScreenState extends State<BooksScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is BookError) {
-            return Center(child: Text("Error: ${state.message}"));
+            return Center(child: Text("Failed to fetch books: ${state.message}"));
           }
           if (state is BookLoaded) {
-            return ListView.builder(
-              itemCount: state.books.length,
-              itemBuilder: (context, index) {
-                final book = state.books[index];
-                return ListTile(
-                  title: Text(book.title),
-                  subtitle: Text(book.author),
-                  trailing: isAdmin == true
-                      ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => EditBookScreen(book: book),
-                          ),
+            return Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: GridView.builder(
+                itemCount: state.books.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Two books per row
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.85, // Adjust height
+                ),
+                itemBuilder: (context, index) {
+                  final book = state.books[index];
+                  return GestureDetector(
+                    onTap: () {
+                      _showBookDetailsDialog(context, book);
+                    },
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              book.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              "Author: ${book.author}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            if (isAdmin == true)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => EditBookScreen(book: book),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => _confirmDelete(context, book.id),
+                                  ),
+                                ],
+                              ),
+                          ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () => _confirmDelete(context, book.id),
-                      ),
-                    ],
-                  )
-                      : null, // Hide for non-admins
-                );
-              },
+                    ),
+                  );
+                },
+              ),
             );
           }
           return const Center(child: Text('No books available'));
         },
       ),
+    );
+  }
+
+  void _showBookDetailsDialog(BuildContext context, BookEntity book) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 6,
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  book.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Author: ${book.author}",
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  book.content,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("Close", style: TextStyle(color: Colors.blue)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

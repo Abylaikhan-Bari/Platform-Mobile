@@ -5,6 +5,7 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// **Sign Up a User**
   Future<User?> signUpWithEmail(String email, String password) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
@@ -17,6 +18,7 @@ class FirebaseService {
     }
   }
 
+  /// **Login a User**
   Future<User?> loginWithEmail(String email, String password) async {
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(
@@ -29,6 +31,7 @@ class FirebaseService {
     }
   }
 
+  /// **Get User's Firebase ID Token**
   Future<String?> getUserIdToken() async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -37,9 +40,7 @@ class FirebaseService {
     return null;
   }
 
-  Future<void> signOut() async => await _auth.signOut();
-
-  /// **New Method: Fetch User Role**
+  /// **Fetch User Role from Firestore**
   Future<String?> getUserRole() async {
     final user = _auth.currentUser;
     if (user != null) {
@@ -54,4 +55,12 @@ class FirebaseService {
     }
     return null; // Return null if no user or role found
   }
+
+  /// **New Method: Get Current User's Email**
+  String? getCurrentUserEmail() {
+    return _auth.currentUser?.email; // Returns null if no user is logged in
+  }
+
+  /// **Logout the User**
+  Future<void> signOut() async => await _auth.signOut();
 }
