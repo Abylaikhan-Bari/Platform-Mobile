@@ -54,3 +54,5 @@ app.*.map.json
 **/credentials/**                # Credentials folder
 **/.keystore                     # Android Keystore for signing
 **/android/key.properties        # Keystore properties for Android
+/ios/Runner/GoogleService-Info.plist
+/lib.zip

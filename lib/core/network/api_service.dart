@@ -6,17 +6,20 @@ import 'package:platform/core/network/firebase_service.dart';
 class ApiService {
   final FirebaseService _firebaseService = FirebaseService();
 
-  Future<http.Response> _authenticatedRequest(
-      String method,
+  Future<http.Response> _authenticatedRequest(String method,
       String endpoint, {
         Map<String, dynamic>? body,
       }) async {
     final token = await _firebaseService.getUserIdToken();
+    if (token == null) {
+      throw Exception("User is not authenticated.");
+    }
+
     final url = Uri.parse('${AppConstants.baseUrl}$endpoint');
 
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $token', // ✅ Correct token usage
     };
 
     switch (method.toUpperCase()) {
@@ -32,6 +35,7 @@ class ApiService {
         throw Exception('Invalid HTTP method');
     }
   }
+
 //Authentication methods
   Future<http.Response> login(String email, String password) async {
     final response = await http.post(
@@ -52,8 +56,13 @@ class ApiService {
   }
 
   Future<List<dynamic>> getBooks() async {
-    final response = await _authenticatedRequest('GET', AppConstants.booksEndpoint);
-    return jsonDecode(response.body);
+    final response = await _authenticatedRequest(
+        'GET', AppConstants.booksEndpoint);
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to fetch books: ${response.body}");
+    }
   }
 
   Future<dynamic> createBook(Map<String, dynamic> bookData) async {
@@ -62,22 +71,45 @@ class ApiService {
       AppConstants.booksEndpoint,
       body: bookData,
     );
-    return jsonDecode(response.body);
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to create book: ${response.body}");
+    }
   }
 
   Future<dynamic> updateBook(String id, Map<String, dynamic> bookData) async {
+    if (id.isEmpty) {
+      throw Exception("Book ID is missing for update.");
+    }
+
     final response = await _authenticatedRequest(
       'PUT',
       '${AppConstants.booksEndpoint}/$id',
       body: bookData,
     );
-    return jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Failed to update book: ${response.body}");
+    }
   }
 
   Future<void> deleteBook(String id) async {
-    await _authenticatedRequest(
+    if (id.isEmpty) {
+      throw Exception("Book ID is missing for deletion.");
+    }
+
+    final response = await _authenticatedRequest(
       'DELETE',
       '${AppConstants.booksEndpoint}/$id',
     );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to delete book: ${response.body}");
+    }
   }
+
 }
