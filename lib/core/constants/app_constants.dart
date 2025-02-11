@@ -1,6 +1,6 @@
 class AppConstants {
   // For local development (Android emulator)
-  static const String baseUrl = 'http://192.168.0.31:5001';
+  static const String baseUrl = 'http://192.168.0.24:5001';
 
   // If using physical device/remote server:
   // static const String baseUrl = 'http://<YOUR_IP>:5001';
