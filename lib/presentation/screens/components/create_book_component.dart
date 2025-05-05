@@ -31,7 +31,7 @@ class _CreateBookScreenState extends State<CreateBookScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  "Add New Book",
+                  "Add New Text",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: 15),

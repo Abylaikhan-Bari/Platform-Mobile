@@ -33,7 +33,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  "Edit Book",
+                  "Edit Text",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
                 const SizedBox(height: 15),

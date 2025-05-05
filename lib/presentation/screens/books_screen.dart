@@ -82,7 +82,7 @@ class _BooksScreenState extends State<BooksScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
-          'Books',
+          'Texts',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
@@ -106,7 +106,7 @@ class _BooksScreenState extends State<BooksScreen> {
               );
             }
             if (state is BookError) {
-              return Center(child: Text("Failed to fetch books: ${state.message}"));
+              return Center(child: Text("Failed to fetch texts: ${state.message}"));
             }
             if (state is BookLoaded) {
               return Padding(
@@ -182,7 +182,7 @@ class _BooksScreenState extends State<BooksScreen> {
                 ),
               );
             }
-            return const Center(child: Text('No books available'));
+            return const Center(child: Text('No texts available'));
           },
         ),
       ),
@@ -253,7 +253,7 @@ class _BooksScreenState extends State<BooksScreen> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  "Are you sure you want to delete this book?",
+                  "Are you sure you want to delete this text?",
                   style: TextStyle(fontSize: 14),
                 ),
                 const SizedBox(height: 20),

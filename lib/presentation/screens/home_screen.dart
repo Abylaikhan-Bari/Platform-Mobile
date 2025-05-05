@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 30),
 
-            _buildMenuButton(Icons.book, "Books", () {
+            _buildMenuButton(Icons.book, "Texts", () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const BooksScreen()));
             }),
             _buildMenuButton(Icons.logout, "Sign Out", _confirmLogout),
